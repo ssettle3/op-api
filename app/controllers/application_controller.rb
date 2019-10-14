@@ -21,6 +21,10 @@ class ApplicationController < ActionController::API
 
   private
 
+  def current_user
+    @current_user
+  end
+
    def allow_profiler_in_envs
     if Rails.env.qa? || Rails.env.development?
       Rack::MiniProfiler.authorize_request
