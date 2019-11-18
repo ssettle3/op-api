@@ -1,12 +1,16 @@
 class AuthenticationController < ApplicationController
-  before_action :authorize_request, except: [:login, :sign_up]
+  before_action :authorize_request, except: [:login, :sign_up, :refresh]
 
   def login
     return render_missing_params if missing_login_params?
 
     if user.authenticate(params[:password])
-      render json: { token: token, exp: token_expiration,
-                     username: user.username }, status: :ok
+      render json: {
+        id: user.id,
+        username: user.username,
+        token: token,
+        exp: token_expiration,
+      }, status: :ok
     else
       render json: { error: 'Incorrect Password' }, status: :unauthorized
     end
@@ -17,7 +21,16 @@ class AuthenticationController < ApplicationController
     return render_password_mismatch if password_mismatch?
 
     user = create_user!
-    render json: { username: user.username, token: token }, status: 201
+    render json: {
+      id: user.id,
+      username: user.username,
+      token: token
+    }, status: 201
+  end
+
+  def refresh
+    return render_unauthorized("Missing JWT token") unless auth_headers.present?
+    render json: { token: Jwt.encode(user_id: user_id) }, status: 201
   end
 
   private
@@ -28,6 +41,10 @@ class AuthenticationController < ApplicationController
 
   def username
     params[:username]
+  end
+
+  def user_id
+    params[:user_id]
   end
 
   def create_user!

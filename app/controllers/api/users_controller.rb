@@ -24,7 +24,7 @@ class Api::UsersController < ApplicationController
   private
 
   def find_user
-    @user = User.find_by_username!(params[:_username])
+    @user = User.find(params[:id])
     rescue ActiveRecord::RecordNotFound
       render json: { errors: 'User not found' }, status: :not_found
   end

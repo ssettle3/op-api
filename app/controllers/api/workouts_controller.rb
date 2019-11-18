@@ -1,13 +1,15 @@
+require "#{Rails.root}/lib/workouts/creator"
+
 class Api::WorkoutsController < ApplicationController
   before_action :authorize_request
 
   def index
-    render json: { data: workouts }
+    render json: current_workouts, each_serializer: ::WorkoutSerializer, root: 'data'
   end
 
   def create
-    workout = workouts.create!(allowed_params)
-    render json: { data: workout }
+    workout = Workouts::Creator.call(user_id: current_user.id, params: allowed_params)
+    render json: workout, serializer: ::WorkoutSerializer, root: 'data'
   end
 
   def show
@@ -26,15 +28,19 @@ class Api::WorkoutsController < ApplicationController
 
   private
 
-  def workouts
+  def current_workouts
     current_user.workouts.current
   end
 
   def workout
-    workouts.find(params[:id])
+    current_workouts.current.find(params[:id])
   end
 
   def allowed_params
     params.permit(:name, :exercise_ids, :in_progress)
+  end
+
+  def workouts
+    current_user.workouts
   end
 end

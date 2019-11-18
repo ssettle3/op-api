@@ -2,7 +2,7 @@ class Api::ExercisesController < ApplicationController
   before_action :authorize_request
 
   def index
-    render json: { data: exercises }
+    render json: exercises
   end
 
   def create
@@ -27,7 +27,7 @@ class Api::ExercisesController < ApplicationController
   private
 
    def exercises
-    current_user.exercises.current
+    current_user.exercises.to_a.concat(Exercise.base_exercises)
   end
 
   def exercise

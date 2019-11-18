@@ -6,11 +6,8 @@ class ApplicationController < ActionController::API
   end
 
   def authorize_request
-    header = request.headers['Authorization']
-    header = header.split(' ').last if header
-
     begin
-      @decoded = Jwt.decode(header)
+      @decoded = Jwt.decode(auth_headers)
       @current_user = User.find(@decoded[:user_id])
     rescue ActiveRecord::RecordNotFound => e
       render json: { errors: e.message }, status: :unauthorized
@@ -29,5 +26,14 @@ class ApplicationController < ActionController::API
     if Rails.env.qa? || Rails.env.development?
       Rack::MiniProfiler.authorize_request
     end
+  end
+
+  def auth_headers
+    header = request.headers['Authorization']
+    header = header.split(' ').last if header
+  end
+
+  def render_unauthorized(message)
+    render json: { error: message }, status: :unauthorized
   end
 end
