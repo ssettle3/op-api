@@ -8,11 +8,15 @@ end
 gem 'rails', '~> 5.1.7'
 gem 'puma', '~> 3.7'
 gem 'pg'
-gem 'active_model_serializers'
+gem 'active_model_serializers', require: true
 gem 'redis', '~> 4.0'
 gem 'jwt'
 gem 'bcrypt', '~> 3.1.7'
 gem "lograge"
+gem "httparty"
+
+# Environmental
+gem "dotenv-rails"
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
